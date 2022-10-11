@@ -1,0 +1,33 @@
+name: Terraform deployment for VPC
+on: [push]
+jobs:
+  terraform-deployment:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+    steps:
+      # EXPORT THE CREDENTIALS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::839895325100:role/github-actions-oidc
+          aws-region: "eu-central-1"
+
+        #download your terreform code in container
+      - name: Clone/Checkout your repository code
+        uses: actions/checkout@v2
+        
+        #download terraform in ubuntu  container
+      - name: Terraform setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Apply the changes
+        run: terraform apply -auto-approve
